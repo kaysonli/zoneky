@@ -1,4 +1,5 @@
 (function() {
+
 	Ext.onReady(function(argument) {
 		var store = Ext.create('Ext.data.JsonStore', {
 			fields: ['name', 'data1', 'data2', 'data3', 'data4', 'data5'],
@@ -69,22 +70,22 @@
 					radius: 7
 				},
 				listeners: {
-					itemclick: function(item){
+					itemclick: function(item) {
 						console.log('line item clicked');
 					},
-					itemmouseover: function(item){
+					itemmouseover: function(item) {
 						console.log('line item mouseover');
 						var me = this;
-						setTimeout(function(){
-							me.showTip(item);
-						}, me.tips.showDelay);
-						// return false;
+						// setTimeout(function(){
+						// 	//me.showTip(item);
+						// }, me.tips.showDelay);
+						return false;
 					},
-					itemmouseout: function(item){
+					itemmouseout: function(item) {
 						var me = this;
-						setTimeout(function(){
-							me.hideTip(item);
-						}, me.tip.hideDelay);
+						// setTimeout(function(){
+						// 	//me.hideTip(item);
+						// }, me.tip.hideDelay);
 						// return false;
 					}
 				},
@@ -115,7 +116,7 @@
 				},
 				axis: 'left',
 				fill: true,
-				xField: 'name',
+				xField: 'data1',
 				yField: 'data2',
 				markerConfig: {
 					type: 'circle',
@@ -136,6 +137,62 @@
 				console.log('mousemove');
 			}
 		})
+		Ext.override('Ext.picker.Date', {
+			onOkClick: function(picker, value) {
+				var me = this,
+					month = value[0],
+					year = value[1],
+					date = new Date(year, month, me.getActive().getDate());
+
+				if (date.getMonth() !== month) {
+					// 'fix' the JS rolling date conversion if needed
+					date = Ext.Date.getLastDateOfMonth(new Date(year, month, 1));
+				}
+				me.setValue(date);
+				me.hideMonthPicker();
+
+				var	handler = me.handler;
+
+				if (!me.disabled) {
+					me.doCancelFocus = me.focusOnSelect === false;
+					delete me.doCancelFocus;
+					me.fireEvent('select', me, me.value);
+					if (handler) {
+						handler.call(me.scope || me, me, me.value);
+					}
+					// event handling is turned off on hide
+					// when we are using the picker in a field
+					// therefore onSelect comes AFTER the select
+					// event.
+					me.onSelect();
+				}
+			}
+		});
+
+		Ext.create('Ext.form.Panel', {
+			renderTo: 'datePicker',
+			width: 300,
+			bodyPadding: 10,
+			title: 'Dates',
+			items: [{
+				xtype: 'datefield',
+				anchor: '100%',
+				showToday: false,
+				listeners: {
+
+				},
+				fieldLabel: 'From',
+				// plugins: ['monthPickerPlugin'],
+				name: 'from_date',
+				maxValue: new Date() // limited to the current date or prior
+			}, {
+				xtype: 'datefield',
+				anchor: '100%',
+				fieldLabel: 'To',
+				name: 'to_date',
+				value: new Date() // defaults to today
+			}]
+		});
 	});
 
 })();
