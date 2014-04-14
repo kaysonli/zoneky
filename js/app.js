@@ -136,8 +136,9 @@
 			'mousemove': function() {
 				console.log('mousemove');
 			}
-		})
-		Ext.override('Ext.picker.Date', {
+		});
+
+		Ext.override(Ext.picker.Date, {
 			onOkClick: function(picker, value) {
 				var me = this,
 					month = value[0],
@@ -151,7 +152,11 @@
 				me.setValue(date);
 				me.hideMonthPicker();
 
-				var	handler = me.handler;
+				if(!me.pickerField.yearMonthOnly){
+					return;
+				}
+
+				var handler = me.handler;
 
 				if (!me.disabled) {
 					me.doCancelFocus = me.focusOnSelect === false;
@@ -166,6 +171,13 @@
 					// event.
 					me.onSelect();
 				}
+			},
+
+			onCancelClick: function() {
+				// update the selected value, also triggers a focus
+				this.selectedUpdate(this.activeDate);
+				this.hideMonthPicker();
+				this.hide();
 			}
 		});
 
@@ -178,8 +190,11 @@
 				xtype: 'datefield',
 				anchor: '100%',
 				showToday: false,
+				yearMonthOnly: true,
 				listeners: {
-
+					expand: function(date, eOpts) {
+						date.picker.showMonthPicker();
+					}
 				},
 				fieldLabel: 'From',
 				// plugins: ['monthPickerPlugin'],
