@@ -152,7 +152,7 @@
 				me.setValue(date);
 				me.hideMonthPicker();
 
-				if(!me.pickerField.yearMonthOnly){
+				if (!me.pickerField.yearMonthOnly) {
 					return;
 				}
 
@@ -210,4 +210,22 @@
 		});
 	});
 
+
 })();
+
+$(function() {
+	$("#btnDownload").click(function() {
+		$.ajax({
+			url: 'http://table.finance.yahoo.com/table.csv?s=000001.ss',
+			dataType : "jsonp",
+			jsonpCallback:"jsonpCallback",
+			success: function(data) {
+				console.log(data);
+			}
+		})
+	});
+
+	function jsonpCallback(data){
+		console.log(data);
+	}
+});

@@ -33,7 +33,7 @@ Ext.define('Roc.component.MonthPicker', {
     }
 
 
-})；
+});
 // Ext.define('Ext.ux.MonthPickerPlugin', {
 //     alias: 'plugin.monthPickerPlugin',
 //     picker: null,

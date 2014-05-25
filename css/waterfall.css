@@ -1,0 +1,24 @@
+* {
+	margin: 0px;
+}
+
+#container {
+	position: relative;
+}
+
+div.pic {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-shadow: 0 0 5px #ccc;
+}
+
+div.box {
+	float: left;
+	/*position: absolute;*/
+	padding: 15px 0 0 15px;
+}
+
+div.box img {
+	width: 180px;
+}
