@@ -18,9 +18,12 @@ namespace WebDownloader
 	/// <summary>
 	/// Description of HttpClient.
 	/// </summary>
-	public static class Tool
+	public  class Tool
 	{
-		public static Dictionary<string, string> FetchPreMarkups(string[] urls)
+		private string _postDir = "posts";
+		private string _markupDir = "markups";
+		
+		public  Dictionary<string, string> FetchPreMarkups(string[] urls)
 		{
 			Dictionary<string, string> markups = new Dictionary<string, string>();
 			for (int i = 0, ln = urls.Length; i < ln; i++) {
@@ -33,7 +36,34 @@ namespace WebDownloader
 			return markups;
 		}
 		
-		public static string DownloadPage(string url)
+		public  Dictionary<string, string> FetchPreMarkups()
+		{
+			Dictionary<string, string> markups = new Dictionary<string, string>();
+			string dir = "markups";
+			string[] files = Directory.GetFiles(dir);
+			for (int i = 0, ln = files.Length; i < ln; i++) {
+				string url = files[i];
+				string name = url.Substring(url.IndexOf('\\') + 1);
+				name = name.Substring(11).TrimEnd(".txt".ToCharArray()).Replace('-','/');
+				string content = ReadFromFile(url);
+				string pre = GetPreMarkup(content);
+				markups.Add(name, pre);
+			}
+			return markups;
+		}
+		
+		public  string ReadFromFile(string path)
+		{
+			string content;
+			using(FileStream fs = new FileStream(path, FileMode.Open))
+			{
+				StreamReader reader = new StreamReader(fs);
+				content = reader.ReadToEnd();
+			}
+			return content;
+		}
+		
+		public  string DownloadPage(string url)
 		{
 			string html = "";
 			try
@@ -50,7 +80,7 @@ namespace WebDownloader
 			return html;
 		}
 		
-		public static string GetPreMarkup(string html)
+		public  string GetPreMarkup(string html)
 		{
 			int start = html.IndexOf("<pre>");
 			int end = html.IndexOf("</pre>");
@@ -58,14 +88,14 @@ namespace WebDownloader
 			return pre;
 		}
 		
-		public static void SaveToFile(string yamlTemplate, Dictionary<string, string> dic)
+		public  void SaveToFile(string yamlTemplate, Dictionary<string, string> dic)
 		{
 			foreach(var pair in dic)
 			{
 				string name = pair.Key.TrimEnd();
 				string fileName = DateTime.Today.ToString("yyyy-MM-dd")+ "-" + name.Replace('/', '-');
 				string category = name.Split('/')[0];
-				string detail = name.Split('/')[1];
+				string detail = name.Substring(name.IndexOf('/') + 1);
 				string posts = "posts";
 				if(!Directory.Exists(posts))
 				{
@@ -104,7 +134,7 @@ namespace WebDownloader
 			
 		}
 		
-		public static void SaveToFile(Dictionary<string, string> dic)
+		public  void SaveToFile(Dictionary<string, string> dic)
 		{
 			foreach(var pair in dic)
 			{
@@ -126,14 +156,14 @@ namespace WebDownloader
 			}
 		}
 		
-		private static string[] ExtractKeyword(string url)
+		private  string[] ExtractKeyword(string url)
 		{
 			string decode = System.Web.HttpUtility.UrlDecode(url);
 			string name = decode.Substring(decode.IndexOf('=') + 1);
 			return name.Split('/');
 		}
 		
-		public static string Translate(string[] urls)
+		public  string Translate(string[] urls)
 		{
 			Dictionary<string, string> dic = new Dictionary<string, string>();
 			StringBuilder sb = new StringBuilder();
@@ -153,7 +183,7 @@ namespace WebDownloader
 			return text;
 		}
 		
-		public static string Translate(string word)
+		public  string Translate(string word)
 		{
 			var api = "http://fanyi.youdao.com/openapi.do?keyfrom=zoneky&key=696322534&type=data&doctype=text&version=1.0&q={0}";
 			var result = DownloadPage(string.Format(api, word));

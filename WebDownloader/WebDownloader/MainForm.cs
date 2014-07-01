@@ -33,13 +33,15 @@ namespace WebDownloader
 		void BtnFetchClick(object sender, EventArgs e)
 		{
 			string[] urls = txtUrls.Text.Split('\n');
-			Dictionary<string, string> markups = Tool.FetchPreMarkups(urls);
-			Tool.SaveToFile(txtYAML.Text, markups);
+//			Dictionary<string, string> markups = Tool.FetchPreMarkups(urls);
+			Tool tool = new Tool();
+			Dictionary<string, string> markups = tool.FetchPreMarkups();
+			tool.SaveToFile(txtYAML.Text, markups);
 		}
 		
 		void BtnTranslateClick(object sender, EventArgs e)
 		{
-			Tool.Translate(txtUrls.Text.Split('\n'));
+			new Tool().Translate(txtUrls.Text.Split('\n'));
 		}
 	}
 }
