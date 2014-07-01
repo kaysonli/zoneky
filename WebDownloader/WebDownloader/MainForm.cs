@@ -36,5 +36,10 @@ namespace WebDownloader
 			Dictionary<string, string> markups = Tool.FetchPreMarkups(urls);
 			Tool.SaveToFile(txtYAML.Text, markups);
 		}
+		
+		void BtnTranslateClick(object sender, EventArgs e)
+		{
+			Tool.Translate(txtUrls.Text.Split('\n'));
+		}
 	}
 }

@@ -7,9 +7,11 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
-using System.Net;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Web;
 
 namespace WebDownloader
 {
@@ -60,7 +62,10 @@ namespace WebDownloader
 		{
 			foreach(var pair in dic)
 			{
-				string fileName = DateTime.Today.ToString("yyyy-MM-dd")+ "-" + pair.Key.TrimEnd().Replace('/', '-');
+				string name = pair.Key.TrimEnd();
+				string fileName = DateTime.Today.ToString("yyyy-MM-dd")+ "-" + name.Replace('/', '-');
+				string category = name.Split('/')[0];
+				string detail = name.Split('/')[1];
 				string posts = "posts";
 				if(!Directory.Exists(posts))
 				{
@@ -76,7 +81,7 @@ namespace WebDownloader
 				using(FileStream fs = new FileStream(Path.Combine(posts, fileName + ".md"), FileMode.Create))
 				{
 					StreamWriter sw = new StreamWriter(fs);
-					string yaml = string.Format(yamlTemplate, pair.Key);
+					string yaml = string.Format(yamlTemplate, detail, category);
 					sw.WriteLine(yaml);
 					sw.WriteLine("{% raw %}");
 					sw.WriteLine(pair.Value);
@@ -119,6 +124,42 @@ namespace WebDownloader
 					sw.Close();
 				}
 			}
+		}
+		
+		private static string[] ExtractKeyword(string url)
+		{
+			string decode = System.Web.HttpUtility.UrlDecode(url);
+			string name = decode.Substring(decode.IndexOf('=') + 1);
+			return name.Split('/');
+		}
+		
+		public static string Translate(string[] urls)
+		{
+			Dictionary<string, string> dic = new Dictionary<string, string>();
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < urls.Length; i++) {
+				string[] names = ExtractKeyword(urls[i].TrimEnd());
+				foreach(var n in names)
+				{
+					if(!dic.ContainsKey(n))
+					{
+						var trans = Translate(n);
+						dic.Add(n, trans);
+						sb.AppendLine(n + ":" + trans);
+					}
+				}
+			}
+			string text = sb.ToString();
+			return text;
+		}
+		
+		public static string Translate(string word)
+		{
+			var api = "http://fanyi.youdao.com/openapi.do?keyfrom=zoneky&key=696322534&type=data&doctype=text&version=1.0&q={0}";
+			var result = DownloadPage(string.Format(api, word));
+			var lines = result.Split('\n');
+			var w = lines[1].Split('=')[1];
+			return w;
 		}
 		
 	}
