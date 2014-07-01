@@ -41,7 +41,7 @@ namespace WebDownloader
 		
 		void BtnTranslateClick(object sender, EventArgs e)
 		{
-			new Tool().Translate(txtUrls.Text.Split('\n'));
+			new Tool().GenerateDictionary(txtUrls.Text.Split('\n'));
 		}
 	}
 }

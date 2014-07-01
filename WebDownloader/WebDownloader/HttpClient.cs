@@ -47,7 +47,10 @@ namespace WebDownloader
 				name = name.Substring(11).TrimEnd(".txt".ToCharArray()).Replace('-','/');
 				string content = ReadFromFile(url);
 				string pre = GetPreMarkup(content);
-				markups.Add(name, pre);
+				if(!markups.ContainsKey(name))
+				{
+					markups.Add(name, pre);
+				}
 			}
 			return markups;
 		}
@@ -88,14 +91,62 @@ namespace WebDownloader
 			return pre;
 		}
 		
+		public Dictionary<string, string> GetWordDictionary()
+		{
+			Dictionary<string, string> dic = new Dictionary<string, string>();
+			try
+			{
+				string text = "";
+				using(FileStream fs = new FileStream("dictionary.txt", FileMode.Open))
+				{
+					StreamReader reader = new StreamReader(fs);
+					text = reader.ReadToEnd();
+					reader.Close();
+				}
+				string[] lines = text.Split('\n');
+				for (int i = 0; i < lines.Length; i++) {
+					string line = lines[i];
+					string[] parts = line.Split(':');
+					dic.Add(parts[0], parts[1].TrimEnd());
+				}
+			}
+			catch(Exception e)
+			{
+				
+			}
+			
+			return dic;
+			
+		}
+		
+		private string TranslateLocally(string word)
+		{
+			return "";
+		}
+		
 		public  void SaveToFile(string yamlTemplate, Dictionary<string, string> dic)
 		{
+			Dictionary<string, string> wordsDic = this.GetWordDictionary();
 			foreach(var pair in dic)
 			{
 				string name = pair.Key.TrimEnd();
 				string fileName = DateTime.Today.ToString("yyyy-MM-dd")+ "-" + name.Replace('/', '-');
 				string category = name.Split('/')[0];
+				if(wordsDic.ContainsKey(category))
+				{
+					category = wordsDic[category];
+				}
 				string detail = name.Substring(name.IndexOf('/') + 1);
+				string[] parts = detail.Split('/');
+				for (int i = 0; i < parts.Length; i++) {
+					string rep = parts[i];
+					if(wordsDic.ContainsKey(rep))
+					{
+						rep = wordsDic[rep];
+					}
+					detail = detail.Replace(parts[i], rep);
+				}
+				
 				string posts = "posts";
 				if(!Directory.Exists(posts))
 				{
@@ -163,7 +214,7 @@ namespace WebDownloader
 			return name.Split('/');
 		}
 		
-		public  string Translate(string[] urls)
+		public  string GenerateDictionary(string[] urls)
 		{
 			Dictionary<string, string> dic = new Dictionary<string, string>();
 			StringBuilder sb = new StringBuilder();
@@ -173,7 +224,7 @@ namespace WebDownloader
 				{
 					if(!dic.ContainsKey(n))
 					{
-						var trans = Translate(n);
+						var trans = TranslateOnline(n);
 						dic.Add(n, trans);
 						sb.AppendLine(n + ":" + trans);
 					}
@@ -183,7 +234,7 @@ namespace WebDownloader
 			return text;
 		}
 		
-		public  string Translate(string word)
+		public  string TranslateOnline(string word)
 		{
 			var api = "http://fanyi.youdao.com/openapi.do?keyfrom=zoneky&key=696322534&type=data&doctype=text&version=1.0&q={0}";
 			var result = DownloadPage(string.Format(api, word));
