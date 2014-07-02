@@ -44,6 +44,7 @@ namespace WebDownloader
 			for (int i = 0, ln = files.Length; i < ln; i++) {
 				string url = files[i];
 				string name = url.Substring(url.IndexOf('\\') + 1);
+				name = HttpUtility.UrlDecode(name);
 				name = name.Substring(11).TrimEnd(".txt".ToCharArray()).Replace('-','/');
 				string content = ReadFromFile(url);
 				string pre = GetPreMarkup(content);
@@ -171,16 +172,16 @@ namespace WebDownloader
 					sw.Close();
 				}
 				
-				using(FileStream fs = new FileStream(Path.Combine(markups, fileName + ".txt"), FileMode.Create))
-				{
-					StreamWriter sw = new StreamWriter(fs);
-					
-					sw.WriteLine("{% raw %}");
-					sw.WriteLine(pair.Value);
-					sw.WriteLine("{% endraw %}");
-					sw.Flush();
-					sw.Close();
-				}
+//				using(FileStream fs = new FileStream(Path.Combine(markups, fileName + ".txt"), FileMode.Create))
+//				{
+//					StreamWriter sw = new StreamWriter(fs);
+//					
+//					sw.WriteLine("{% raw %}");
+//					sw.WriteLine(pair.Value);
+//					sw.WriteLine("{% endraw %}");
+//					sw.Flush();
+//					sw.Close();
+//				}
 			}
 			
 		}
