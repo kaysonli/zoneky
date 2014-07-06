@@ -25,22 +25,22 @@ namespace AutoFinder
 	public partial class MainForm : Form
 	{
 		private BlobCounter bc = new BlobCounter();
-        private BlobWindow blobWnd = new BlobWindow();
-        private Difference differenceFilter = new Difference();
-        private Rectangle[] diffRects;
-        private GrabImage graber = new GrabImage();
-        private Grayscale grayFilter = new Grayscale(0.2125, 0.7154, 0.0721);
-        private const int imageHeight = 450;
-        private const int imageWidth = 500;
-        private int imageX;
-        private int imageY;
-        private string savePath;
-        private Threshold thresholdFilter = new Threshold(15);
-        private const int WM_GRAB = 0x8888;
-        private const int WM_REFRESH = 0x9999;
-        ConfigLoader configLoader;
-        GameWindowInfo playground;
-        GameType gameType = GameType.Lady;
+		private BlobWindow blobWnd = new BlobWindow();
+		private Difference differenceFilter = new Difference();
+		private Rectangle[] diffRects;
+		private GrabImage graber = new GrabImage();
+		private Grayscale grayFilter = new Grayscale(0.2125, 0.7154, 0.0721);
+		private const int imageHeight = 450;
+		private const int imageWidth = 500;
+		private int imageX;
+		private int imageY;
+		private string savePath;
+		private Threshold thresholdFilter = new Threshold(15);
+		private const int WM_GRAB = 0x8888;
+		private const int WM_REFRESH = 0x9999;
+		ConfigLoader configLoader;
+		GameWindowInfo playground;
+		GameType gameType = GameType.Lady;
 		
 		[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)]
 		public static extern IntPtr GetForegroundWindow();
@@ -49,18 +49,18 @@ namespace AutoFinder
 		private static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
 		
 		[DllImport("user32")]
-        public static extern IntPtr SetActiveWindow(IntPtr hWnd);
-        [DllImport("user32")]
-        public static extern bool SetWindowPos(int hwnd, int hWndInsertAfter, int x, int y, int cx, int cy, uint wFlags);
+		public static extern IntPtr SetActiveWindow(IntPtr hWnd);
+		[DllImport("user32")]
+		public static extern bool SetWindowPos(int hwnd, int hWndInsertAfter, int x, int y, int cx, int cy, uint wFlags);
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct RECT
-        {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
-        }
+		[StructLayout(LayoutKind.Sequential)]
+		public struct RECT
+		{
+			public int Left;
+			public int Top;
+			public int Right;
+			public int Bottom;
+		}
 		
 		public MainForm()
 		{
@@ -70,17 +70,17 @@ namespace AutoFinder
 			InitializeComponent();
 			
 			if (!Directory.Exists(Application.StartupPath + @"\Save"))
-            {
-                Directory.CreateDirectory(Application.StartupPath + @"\Save");
-                this.savePath = Application.StartupPath + @"\Save";
-            }
-            else
-            {
-                this.savePath = Application.StartupPath + @"\Save";
-            }
-            
-            configLoader = new ConfigLoader();
-            playground = configLoader.GetPlaygroundInfo(GameType.Lady);
+			{
+				Directory.CreateDirectory(Application.StartupPath + @"\Save");
+				this.savePath = Application.StartupPath + @"\Save";
+			}
+			else
+			{
+				this.savePath = Application.StartupPath + @"\Save";
+			}
+			
+			configLoader = new ConfigLoader();
+			
 			//
 			// TODO: Add constructor code after the InitializeComponent() call.
 			//
@@ -88,6 +88,9 @@ namespace AutoFinder
 		
 		protected override void DefWndProc(ref Message m)
 		{
+			playground = configLoader.GetPlaygroundInfo(this.gameType);
+			this.blobWnd.Width = playground.Width;
+			this.blobWnd.Height = playground.Height;
 			switch (m.Msg)
 			{
 				case 0x8888:
@@ -100,15 +103,23 @@ namespace AutoFinder
 						GetWindowRect(foregroundWindow, ref lpRect);
 						int left = lpRect.Left;
 						int top = lpRect.Top;
-						this.imageX = left + 0x202;
-						this.imageY = top + 190;
-						Bitmap bitmap = this.graber.TakePhoto(500, 450, left + 5, this.imageY);
-						Bitmap bitmap2 = this.graber.TakePhoto(500, 450, this.imageX, this.imageY);
+						this.imageX = left + playground.Width + playground.MarginLeft + playground.Gutter;
+						this.imageY = top + playground.MarginTop;
+						Bitmap bitmap = this.graber.TakePhoto(playground.Width, playground.Height, left + playground.MarginLeft, this.imageY);
+						Bitmap bitmap2 = this.graber.TakePhoto(playground.Width, playground.Height, this.imageX, this.imageY);
 						if (this.checkBoxSaveImg.Checked)
 						{
-							string str = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "_1.jpg";
-							string text1 = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "_2.jpg";
-							bitmap.Save(this.savePath + @"\" + str, ImageFormat.Jpeg);
+							try
+							{
+								string str = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "_1.jpg";
+								string text1 = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "_2.jpg";
+								bitmap.Save(this.savePath + @"\" + str, ImageFormat.Jpeg);
+//								bitmap2.Save(this.savePath + @"\" + text1, ImageFormat.Jpeg);
+							}
+							catch(Exception ex)
+							{
+								
+							}
 						}
 						Bitmap image = (Bitmap) bitmap.Clone();
 						Bitmap bitmap4 = (Bitmap) bitmap2.Clone();
@@ -121,7 +132,7 @@ namespace AutoFinder
 						this.diffRects = this.bc.GetObjectsRectangles();
 						this.blobWnd.Location = new Point(this.imageX, this.imageY);
 						this.blobWnd.BlobRects = this.diffRects;
-						SetWindowPos(this.blobWnd.Handle.ToInt32(), -1, this.blobWnd.Location.X, this.blobWnd.Location.Y, this.blobWnd.Width, this.blobWnd.Height, 1);
+						SetWindowPos(this.blobWnd.Handle.ToInt32(), -1, this.blobWnd.Location.X, this.blobWnd.Location.Y, playground.Width, playground.Height, 1);
 						this.blobWnd.Show();
 						this.blobWnd.Invalidate();
 						return;

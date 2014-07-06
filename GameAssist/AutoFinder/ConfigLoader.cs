@@ -18,7 +18,7 @@ namespace AutoFinder
 	/// </summary>
 	public class ConfigLoader
 	{
-		private string configUrl = "autofinder-config.xml";
+		private string configUrl = "../../autofinder-config.xml";
 		XmlDocument doc = new XmlDocument();
 		
 		public ConfigLoader()
