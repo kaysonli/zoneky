@@ -21,7 +21,7 @@ namespace AutoFinder
 	{
 		private string configUrl = "../../autofinder-config.xml";
 		private string remoteUrl = "http://lzkwin.github.io/studio/autofinder-config.xml";
-		bool useRemote = true;
+		bool useRemote = false;
 		XmlDocument doc = new XmlDocument();
 		
 		public string DownloadFile(string url)
@@ -69,7 +69,7 @@ namespace AutoFinder
 		public int AdsInterval
 		{
 			get {
-				string interval = doc.SelectSingleNode("config/adds/interval").InnerText;
+				string interval = doc.SelectSingleNode("config/ads/interval").InnerText;
 				int val = 3000;
 				if(!int.TryParse(interval, out val))
 				{
@@ -77,6 +77,73 @@ namespace AutoFinder
 				}
 				return val;
 			}
+		}
+		
+		public string AdsTitle 
+		{
+			get
+			{
+				return doc.SelectSingleNode("config/ads/title").InnerText;
+			}
+		}
+		
+		public string Version
+		{
+			get
+			{
+				return doc.SelectSingleNode("config/startup/version").InnerText;
+			}
+		}
+		
+		public string HelpPage 
+		{
+			get
+			{
+				var helpPage = doc.SelectSingleNode("config/startup/help-page");
+				if(helpPage != null)
+				{
+					return helpPage.InnerText;
+				}
+				return "";
+			}
+		}
+		
+		public string DownloadPage 
+		{
+			get
+			{
+				var downloadPage = doc.SelectSingleNode("config/startup/download-page");
+				if(downloadPage != null)
+				{
+					return downloadPage.InnerText;
+				}
+				return "";
+			}
+		}
+		
+		public string OpenPageUrl
+		{
+			get
+			{
+				var onClose = doc.SelectSingleNode("config/startup/onclose");
+				bool open = bool.Parse(onClose.Attributes["open"].Value);
+				if(open)
+				{
+					return onClose.Attributes["url"].Value;
+				}
+				return "";
+			}
+		}
+		
+		public List<string> GetVipList()
+		{
+			var users = doc.SelectSingleNode("config/startup/vips");
+			List<string> ids = new List<string>();
+			foreach(XmlNode node in users)
+			{
+				ids.Add(node.InnerText);
+			}
+			return ids;
 		}
 		
 		public List<AdInfo> GetScreenAds()
@@ -95,7 +162,7 @@ namespace AutoFinder
 			return ads;
 		}
 		
-		public List<AdInfo> GetStatusBarAds()
+		public List<AdInfo> GetBottomAds()
 		{
 			List<AdInfo> ads = new List<AdInfo>();
 			var nodes = doc.SelectSingleNode("config/ads/statusbar");
@@ -103,7 +170,7 @@ namespace AutoFinder
 			{
 				AdInfo ad = new AdInfo()
 				{
-					ImageUrl = node.Attributes["text"].Value,
+					Text = node.Attributes["text"].Value,
 					ClickUrl = node.Attributes["clickUrl"].Value
 				};
 				ads.Add(ad);

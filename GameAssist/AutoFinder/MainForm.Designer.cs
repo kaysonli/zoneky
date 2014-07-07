@@ -51,6 +51,9 @@ namespace AutoFinder
 			this.radioButton1 = new System.Windows.Forms.RadioButton();
 			this.radioButton2 = new System.Windows.Forms.RadioButton();
 			this.label1 = new System.Windows.Forms.Label();
+			this.timer1 = new System.Windows.Forms.Timer(this.components);
+			this.lblAdTitle = new System.Windows.Forms.Label();
+			this.lnkAd = new System.Windows.Forms.LinkLabel();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -63,18 +66,19 @@ namespace AutoFinder
 			// 
 			// pictureBox1
 			// 
-			this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Top;
+			this.pictureBox1.Cursor = System.Windows.Forms.Cursors.Hand;
 			this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-			this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+			this.pictureBox1.Location = new System.Drawing.Point(0, 35);
 			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(415, 381);
+			this.pictureBox1.Size = new System.Drawing.Size(415, 377);
 			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.pictureBox1.TabIndex = 1;
 			this.pictureBox1.TabStop = false;
+			this.pictureBox1.Click += new System.EventHandler(this.PictureBox1Click);
 			// 
 			// btnMonitor
 			// 
-			this.btnMonitor.Location = new System.Drawing.Point(12, 424);
+			this.btnMonitor.Location = new System.Drawing.Point(9, 455);
 			this.btnMonitor.Name = "btnMonitor";
 			this.btnMonitor.Size = new System.Drawing.Size(75, 23);
 			this.btnMonitor.TabIndex = 2;
@@ -84,25 +88,27 @@ namespace AutoFinder
 			// 
 			// btnHide
 			// 
-			this.btnHide.Location = new System.Drawing.Point(108, 424);
+			this.btnHide.Location = new System.Drawing.Point(105, 455);
 			this.btnHide.Name = "btnHide";
 			this.btnHide.Size = new System.Drawing.Size(75, 23);
 			this.btnHide.TabIndex = 3;
 			this.btnHide.Text = "隐藏";
 			this.btnHide.UseVisualStyleBackColor = true;
+			this.btnHide.Click += new System.EventHandler(this.BtnHideClick);
 			// 
 			// btnHelp
 			// 
-			this.btnHelp.Location = new System.Drawing.Point(202, 424);
+			this.btnHelp.Location = new System.Drawing.Point(199, 455);
 			this.btnHelp.Name = "btnHelp";
 			this.btnHelp.Size = new System.Drawing.Size(75, 23);
 			this.btnHelp.TabIndex = 4;
 			this.btnHelp.Text = "帮助";
 			this.btnHelp.UseVisualStyleBackColor = true;
+			this.btnHelp.Click += new System.EventHandler(this.BtnHelpClick);
 			// 
 			// checkBoxSaveImg
 			// 
-			this.checkBoxSaveImg.Location = new System.Drawing.Point(299, 423);
+			this.checkBoxSaveImg.Location = new System.Drawing.Point(296, 454);
 			this.checkBoxSaveImg.Name = "checkBoxSaveImg";
 			this.checkBoxSaveImg.Size = new System.Drawing.Size(104, 24);
 			this.checkBoxSaveImg.TabIndex = 5;
@@ -112,7 +118,7 @@ namespace AutoFinder
 			// radioButton1
 			// 
 			this.radioButton1.Checked = true;
-			this.radioButton1.Location = new System.Drawing.Point(132, 387);
+			this.radioButton1.Location = new System.Drawing.Point(129, 418);
 			this.radioButton1.Name = "radioButton1";
 			this.radioButton1.Size = new System.Drawing.Size(104, 24);
 			this.radioButton1.TabIndex = 6;
@@ -123,7 +129,7 @@ namespace AutoFinder
 			// 
 			// radioButton2
 			// 
-			this.radioButton2.Location = new System.Drawing.Point(230, 387);
+			this.radioButton2.Location = new System.Drawing.Point(227, 418);
 			this.radioButton2.Name = "radioButton2";
 			this.radioButton2.Size = new System.Drawing.Size(104, 24);
 			this.radioButton2.TabIndex = 7;
@@ -134,17 +140,44 @@ namespace AutoFinder
 			// label1
 			// 
 			this.label1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-			this.label1.Location = new System.Drawing.Point(12, 388);
+			this.label1.Location = new System.Drawing.Point(9, 419);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(100, 23);
 			this.label1.TabIndex = 8;
 			this.label1.Text = "你玩的是：";
 			// 
+			// timer1
+			// 
+			this.timer1.Tick += new System.EventHandler(this.Timer1Tick);
+			// 
+			// lblAdTitle
+			// 
+			this.lblAdTitle.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+			this.lblAdTitle.Location = new System.Drawing.Point(3, 9);
+			this.lblAdTitle.Name = "lblAdTitle";
+			this.lblAdTitle.Size = new System.Drawing.Size(406, 23);
+			this.lblAdTitle.TabIndex = 9;
+			this.lblAdTitle.Text = "...";
+			// 
+			// lnkAd
+			// 
+			this.lnkAd.Font = new System.Drawing.Font("微软雅黑", 10F);
+			this.lnkAd.LinkColor = System.Drawing.Color.Red;
+			this.lnkAd.Location = new System.Drawing.Point(9, 485);
+			this.lnkAd.Name = "lnkAd";
+			this.lnkAd.Size = new System.Drawing.Size(400, 23);
+			this.lnkAd.TabIndex = 10;
+			this.lnkAd.TabStop = true;
+			this.lnkAd.Text = "火眼金睛";
+			this.lnkAd.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LnkAdLinkClicked);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(415, 462);
+			this.ClientSize = new System.Drawing.Size(415, 511);
+			this.Controls.Add(this.lnkAd);
+			this.Controls.Add(this.lblAdTitle);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.radioButton2);
 			this.Controls.Add(this.radioButton1);
@@ -153,15 +186,20 @@ namespace AutoFinder
 			this.Controls.Add(this.btnHide);
 			this.Controls.Add(this.btnMonitor);
 			this.Controls.Add(this.pictureBox1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Location = new System.Drawing.Point(10, 10);
 			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "火眼金睛QQ找茬辅助";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
 			this.SizeChanged += new System.EventHandler(this.MainFormSizeChanged);
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.ResumeLayout(false);
 		}
+		private System.Windows.Forms.LinkLabel lnkAd;
+		private System.Windows.Forms.Label lblAdTitle;
+		private System.Windows.Forms.Timer timer1;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.RadioButton radioButton2;
 		private System.Windows.Forms.RadioButton radioButton1;
@@ -175,34 +213,64 @@ namespace AutoFinder
 		void MainFormSizeChanged(object sender, System.EventArgs e)
 		{
 			if (base.WindowState == System.Windows.Forms.FormWindowState.Minimized)
-            {
-                base.Hide();
-                this.notifyIcon1.Visible = true;
-            }
+			{
+				base.Hide();
+				this.notifyIcon1.Visible = true;
+			}
 		}
 		
 		void NotifyIcon1MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
 		{
 			base.Visible = true;
-            base.WindowState = System.Windows.Forms.FormWindowState.Normal;
-            this.notifyIcon1.Visible = false;
+			base.WindowState = System.Windows.Forms.FormWindowState.Normal;
+			this.notifyIcon1.Visible = false;
 		}
 		
 		void BtnMonitorClick(object sender, System.EventArgs e)
 		{
-			 if (this.btnMonitor.Text == "开始找茬")
-            {
-                InterceptKeys.RunHook();
-                this.btnMonitor.Text = "不玩了";
-            }
-            else
-            {
-                InterceptKeys.UnHook();
-                this.blobWnd.Hide();
-                this.btnMonitor.Text = "开始找茬";
-                ComponentResourceManager manager = new ComponentResourceManager(typeof(MainForm));
-                this.pictureBox1.Image = (System.Drawing.Image) manager.GetObject("pictureBox1.Image");
-            }
+			if(IsLatestVersion() == false)
+			{
+				var result = MessageBox.Show("当前不是最新版本，无法继续使用。请点击确定下载最新版", "版本更新", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+				if(result == DialogResult.OK)
+				{
+					System.Diagnostics.Process.Start(configLoader.DownloadPage);
+				}
+				return;
+			}
+			ComponentResourceManager manager = new ComponentResourceManager(typeof(MainForm));
+			this.pictureBox1.Image = (System.Drawing.Image) manager.GetObject("pictureBox1.Image");
+			if (this.btnMonitor.Text == "开始找茬")
+			{
+				timer1.Stop();
+				InterceptKeys.RunHook();
+				this.btnMonitor.Text = "不玩了";
+			}
+			else
+			{
+				InterceptKeys.UnHook();
+				this.blobWnd.Hide();
+				if(isVip == false)
+				{
+					this.timer1.Start();
+				}
+				this.btnMonitor.Text = "开始找茬";
+				
+			}
+		}
+		
+		void PictureBox1Click(object sender, System.EventArgs e)
+		{
+			if(pictureBox1.Tag == null)
+			{
+				return;
+			}
+			string clickUrl = pictureBox1.Tag.ToString();
+			System.Diagnostics.Process.Start(clickUrl);
+		}
+		
+		void BtnHideClick(object sender, System.EventArgs e)
+		{
+			base.WindowState = FormWindowState.Minimized;
 		}
 	}
 }

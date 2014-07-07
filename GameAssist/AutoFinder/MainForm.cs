@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -41,6 +42,11 @@ namespace AutoFinder
 		ConfigLoader configLoader;
 		GameWindowInfo playground;
 		GameType gameType = GameType.Lady;
+		int screenAdIndex = 0;
+		int bottomAdIndex = 0;
+		List<Bitmap> adImages = new List<Bitmap>();
+		bool isVip = false;
+		string version = "v1.3";
 		
 		[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)]
 		public static extern IntPtr GetForegroundWindow();
@@ -62,6 +68,34 @@ namespace AutoFinder
 			public int Bottom;
 		}
 		
+		public Bitmap DownloadImage(string url)
+		{
+			Bitmap image = null;
+			try
+			{
+				HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+				HttpWebResponse res = (HttpWebResponse)req.GetResponse();
+				image = new Bitmap(res.GetResponseStream());
+			}
+			catch(Exception ex)
+			{
+				
+			}
+			return image;
+		}
+		
+		private bool IsUserVIP()
+		{
+			List<string> vips = configLoader.GetVipList();
+			string mac = new Tool().GetMacID();
+			return vips.Contains(mac);
+		}
+		
+		private bool IsLatestVersion()
+		{
+			return version == configLoader.Version;
+		}
+		
 		public MainForm()
 		{
 			//
@@ -81,6 +115,19 @@ namespace AutoFinder
 			
 			configLoader = new ConfigLoader();
 			
+			lnkAd.Tag = configLoader.HelpPage;
+			isVip = IsUserVIP();
+			if(isVip)
+			{
+				lblAdTitle.Visible = false;
+				timer1.Enabled = false;
+			}
+			else
+			{
+				lblAdTitle.Text = configLoader.AdsTitle;
+				timer1.Interval = configLoader.AdsInterval;
+				timer1.Start();
+			}
 			//
 			// TODO: Add constructor code after the InitializeComponent() call.
 			//
@@ -152,6 +199,66 @@ namespace AutoFinder
 		void RadioButton1CheckedChanged(object sender, EventArgs e)
 		{
 			this.gameType = radioButton1.Checked ? GameType.Everyone : GameType.Lady;
+		}
+		
+		void Timer1Tick(object sender, EventArgs e)
+		{
+			List<AdInfo> adList = configLoader.GetScreenAds();
+			List<AdInfo> bottomAds = configLoader.GetBottomAds();
+			screenAdIndex = screenAdIndex % adList.Count;
+			bottomAdIndex = bottomAdIndex % bottomAds.Count;
+			
+			if(adList.Count > 0)
+			{
+				AdInfo ad = adList[screenAdIndex];
+				Bitmap image = null;
+				if(screenAdIndex < adImages.Count)
+				{
+					image = adImages[screenAdIndex];
+				}
+				else
+				{
+					image = DownloadImage(ad.ImageUrl);
+					adImages.Add(image);
+				}
+				if(image != null)
+				{
+					pictureBox1.Image = image;
+					pictureBox1.Tag = ad.ClickUrl;
+				}
+			}
+			if(bottomAds.Count > 0)
+			{
+				lnkAd.Text = bottomAds[bottomAdIndex].Text;
+				lnkAd.Tag = bottomAds[bottomAdIndex].ClickUrl;
+			}
+			++bottomAdIndex;
+			++screenAdIndex;
+		}
+		
+		void MainFormFormClosing(object sender, FormClosingEventArgs e)
+		{
+			InterceptKeys.UnHook();
+			this.blobWnd.Hide();
+			if(!string.IsNullOrEmpty(configLoader.OpenPageUrl) && isVip == false)
+			{
+				System.Diagnostics.Process.Start(configLoader.OpenPageUrl);
+			}
+		}
+		
+		void LnkAdLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			if(lnkAd.Tag == null)
+			{
+				return;
+			}
+			string url = lnkAd.Tag.ToString();
+			System.Diagnostics.Process.Start(url);
+		}
+		
+		void BtnHelpClick(object sender, EventArgs e)
+		{
+			System.Diagnostics.Process.Start(configLoader.HelpPage);
 		}
 	}
 }
