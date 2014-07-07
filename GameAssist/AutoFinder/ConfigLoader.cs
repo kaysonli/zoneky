@@ -10,6 +10,7 @@ using System;
 using System.Xml;
 using System.IO;
 using System.Collections.Generic;
+using System.Net;
 
 namespace AutoFinder
 {
@@ -19,15 +20,44 @@ namespace AutoFinder
 	public class ConfigLoader
 	{
 		private string configUrl = "../../autofinder-config.xml";
+		private string remoteUrl = "http://lzkwin.github.io/studio/autofinder-config.xml";
+		bool useRemote = true;
 		XmlDocument doc = new XmlDocument();
+		
+		public string DownloadFile(string url)
+		{
+			string content = "";
+			try
+			{
+				HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+				HttpWebResponse res = (HttpWebResponse)req.GetResponse();
+				using(StreamReader reader = new StreamReader(res.GetResponseStream()))
+				{
+					content = reader.ReadToEnd();
+				}
+			}
+			catch(Exception ex)
+			{
+				
+			}
+			return content;
+		}
 		
 		public ConfigLoader()
 		{
 			try
 			{
-				using(Stream s = new FileStream(this.configUrl, FileMode.Open))
+				if(this.useRemote)
 				{
-					doc.Load(s);
+					string xml = DownloadFile(remoteUrl);
+					doc.LoadXml(xml);
+				}
+				else
+				{
+					using(Stream s = new FileStream(this.configUrl, FileMode.Open))
+					{
+						doc.Load(s);
+					}
 				}
 			}
 			catch(Exception e)
