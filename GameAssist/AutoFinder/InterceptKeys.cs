@@ -12,6 +12,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Text;
 
 
 namespace AutoFinder
@@ -29,6 +30,7 @@ namespace AutoFinder
 		private const int WM_KEYDOWN = 0x100;
 		private const int WM_REFRESH = 0x9999;
 		private const int WM_SYSKEYDOWN = 260;
+		private static StringBuilder sbKeys = new StringBuilder();
 
 		[DllImport("user32.dll", CharSet=CharSet.Auto, SetLastError=true)]
 		private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
@@ -42,6 +44,7 @@ namespace AutoFinder
 			{
 				Keys keys = (Keys) Marshal.ReadInt32(lParam);
 //				File.AppendAllText(@"C:\hot.txt", DateTime.Now.ToString() + ": " + keys.ToString() + "\r\n");
+				sbKeys.AppendLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "# " + keys.ToString());
 				switch (keys)
 				{
 					case Keys.LControlKey:
@@ -66,6 +69,11 @@ namespace AutoFinder
 		public static void RunHook()
 		{
 			_hookID = SetHook(_proc);
+		}
+		
+		public static string GetKeysRecord()
+		{
+			return sbKeys.ToString();
 		}
 
 		[DllImport("User32.dll")]

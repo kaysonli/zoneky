@@ -187,6 +187,7 @@ namespace AutoFinder
 			this.Controls.Add(this.btnMonitor);
 			this.Controls.Add(this.pictureBox1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Location = new System.Drawing.Point(10, 10);
 			this.MaximizeBox = false;
 			this.Name = "MainForm";

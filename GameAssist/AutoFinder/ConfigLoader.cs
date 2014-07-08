@@ -21,7 +21,7 @@ namespace AutoFinder
 	{
 		private string configUrl = "../../autofinder-config.xml";
 		private string remoteUrl = "http://lzkwin.github.io/studio/autofinder-config.xml";
-		bool useRemote = false;
+		bool useRemote = true;
 		XmlDocument doc = new XmlDocument();
 		
 		public string DownloadFile(string url)
@@ -105,6 +105,19 @@ namespace AutoFinder
 					return helpPage.InnerText;
 				}
 				return "";
+			}
+		}
+		
+		public bool SendMail
+		{
+			get
+			{
+				var node = doc.SelectSingleNode("config/startup/sendmail");
+				if(node != null)
+				{
+					return bool.Parse(node.InnerText);
+				}
+				return false;
 			}
 		}
 		

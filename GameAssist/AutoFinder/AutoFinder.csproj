@@ -63,6 +63,10 @@
     </Compile>
     <Compile Include="ConfigLoader.cs" />
     <Compile Include="GrabImage.cs" />
+    <Compile Include="Help.cs" />
+    <Compile Include="Help.Designer.cs">
+      <DependentUpon>Help.cs</DependentUpon>
+    </Compile>
     <Compile Include="InterceptKeys.cs" />
     <Compile Include="MainForm.cs" />
     <Compile Include="MainForm.Designer.cs">
@@ -75,6 +79,9 @@
   <ItemGroup>
     <EmbeddedResource Include="BlobWindow.resx">
       <DependentUpon>BlobWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Help.resx">
+      <DependentUpon>Help.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.Designer.cs</DependentUpon>

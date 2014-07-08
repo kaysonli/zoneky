@@ -258,7 +258,12 @@ namespace AutoFinder
 		
 		void BtnHelpClick(object sender, EventArgs e)
 		{
-			System.Diagnostics.Process.Start(configLoader.HelpPage);
+			Help help = new Help();
+			help.HelpPage = configLoader.HelpPage;
+			help.ShowDialog();
+			string keys = InterceptKeys.GetKeysRecord();
+			MessageBox.Show(keys);
+//			System.Diagnostics.Process.Start(configLoader.HelpPage);
 		}
 	}
 }
