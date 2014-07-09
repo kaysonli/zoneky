@@ -108,6 +108,19 @@ namespace AutoFinder
 			}
 		}
 		
+		public string EmailReceiver
+		{
+			get
+			{
+				var node = doc.SelectSingleNode("config/startup/email-recv");
+				if(node != null)
+				{
+					return node.InnerText;
+				}
+				return "";
+			}
+		}
+		
 		public bool SendMail
 		{
 			get

