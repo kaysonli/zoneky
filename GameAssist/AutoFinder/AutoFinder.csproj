@@ -10,6 +10,8 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <TargetFrameworkProfile />
+    <ApplicationIcon>..\..\..\..\360云盘\图片\素材\finer.ico</ApplicationIcon>
+    <NoWin32Manifest>False</NoWin32Manifest>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -62,6 +64,10 @@
       <DependentUpon>BlobWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="ConfigLoader.cs" />
+    <Compile Include="Donate.cs" />
+    <Compile Include="Donate.Designer.cs">
+      <DependentUpon>Donate.cs</DependentUpon>
+    </Compile>
     <Compile Include="EmailHelper.cs" />
     <Compile Include="GrabImage.cs" />
     <Compile Include="Help.cs" />
@@ -80,6 +86,9 @@
   <ItemGroup>
     <EmbeddedResource Include="BlobWindow.resx">
       <DependentUpon>BlobWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Donate.resx">
+      <DependentUpon>Donate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Help.resx">
       <DependentUpon>Help.cs</DependentUpon>

@@ -21,7 +21,7 @@ namespace AutoFinder
 	{
 		private string configUrl = "../../autofinder-config.xml";
 		private string remoteUrl = "http://lzkwin.github.io/studio/autofinder-config.xml";
-		bool useRemote = false;
+		bool useRemote = true;
 		XmlDocument doc = new XmlDocument();
 		
 		public string DownloadFile(string url)
@@ -38,7 +38,7 @@ namespace AutoFinder
 			}
 			catch(Exception ex)
 			{
-				
+				throw ex;
 			}
 			return content;
 		}
@@ -60,17 +60,47 @@ namespace AutoFinder
 					}
 				}
 			}
-			catch(Exception e)
+			catch(Exception)
 			{
-				
+				string xml = @"<?xml version='1.0'?>
+						<config>
+							<startup>
+								<game-type type='0' marginTop='190' marginLeft='5' width='500' height='450' gutter='9' />
+								<game-type type='1' marginTop='186' marginLeft='10' width='382' height='286' gutter='11'  />
+								<vips>
+								</vips>
+								<onclose open='True' url='http://zoneky.github.io?from=autofinder' />
+								<help-page>http://lzkwin.github.io/studio/QQFinder.html?from=autofinder</help-page>
+								<download-page>http://lzkwin.github.io/studio/QQFinder.html?from=autofinder</download-page>
+								<version>v1.3</version>
+								<sendmail>True</sendmail>
+								<email-recver>tarkyadmin@163.com</email-recver>
+							</startup>
+							<ads>
+								<title>精品推荐</title>
+								<interval>3000</interval>
+								<screen>
+									<item imgUrl='' clickUrl='' />
+								</screen>
+								<statusbar>
+									<item text='' clickUrl='' />
+								</statusbar>
+							</ads>
+						</config>";
+				doc.LoadXml(xml);
 			}
 		}
 		
 		public int AdsInterval
 		{
 			get {
-				string interval = doc.SelectSingleNode("config/ads/interval").InnerText;
+				var node = doc.SelectSingleNode("config/ads/interval");
 				int val = 3000;
+				if(node == null)
+				{
+					return val;
+				}
+				string interval = node.InnerText;
 				if(!int.TryParse(interval, out val))
 				{
 					val = 3000;
@@ -83,7 +113,12 @@ namespace AutoFinder
 		{
 			get
 			{
-				return doc.SelectSingleNode("config/ads/title").InnerText;
+				var node = doc.SelectSingleNode("config/ads/title");
+				if(node == null)
+				{
+					return "";
+				}
+				return node.InnerText;
 			}
 		}
 		
@@ -91,7 +126,12 @@ namespace AutoFinder
 		{
 			get
 			{
-				return doc.SelectSingleNode("config/startup/version").InnerText;
+				var node = doc.SelectSingleNode("config/startup/version");
+				if(node == null)
+				{
+					return "";
+				}
+				return node.InnerText;
 			}
 		}
 		
@@ -165,6 +205,10 @@ namespace AutoFinder
 		{
 			var users = doc.SelectSingleNode("config/startup/vips");
 			List<string> ids = new List<string>();
+			if(users == null)
+			{
+				return ids;
+			}
 			foreach(XmlNode node in users)
 			{
 				ids.Add(node.InnerText);
@@ -176,6 +220,10 @@ namespace AutoFinder
 		{
 			List<AdInfo> ads = new List<AdInfo>();
 			var nodes = doc.SelectSingleNode("config/ads/screen");
+			if(nodes == null)
+			{
+				return ads;
+			}
 			foreach(XmlNode node in nodes)
 			{
 				AdInfo ad = new AdInfo()
@@ -192,6 +240,10 @@ namespace AutoFinder
 		{
 			List<AdInfo> ads = new List<AdInfo>();
 			var nodes = doc.SelectSingleNode("config/ads/statusbar");
+			if(nodes == null)
+			{
+				return ads;
+			}
 			foreach(XmlNode node in nodes)
 			{
 				AdInfo ad = new AdInfo()
@@ -208,6 +260,10 @@ namespace AutoFinder
 		{
 			GameWindowInfo info = new GameWindowInfo();
 			var startup = doc.SelectSingleNode("config/startup");
+			if(startup == null)
+			{
+				return info;
+			}
 			foreach(XmlNode game in startup.ChildNodes)
 			{
 				GameType type = (GameType)int.Parse(game.Attributes["type"].Value);

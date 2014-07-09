@@ -50,7 +50,7 @@ namespace AutoFinder
                 client.Send(mailMessage);//发送邮件
                 //client.SendAsync(mailMessage, "ojb");异步方法发送邮件,不会阻塞线程.
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 		}

