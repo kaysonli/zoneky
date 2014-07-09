@@ -13,6 +13,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 
 using AForge.Imaging;
@@ -47,6 +48,7 @@ namespace AutoFinder
 		List<Bitmap> adImages = new List<Bitmap>();
 		bool isVip = false;
 		string version = "v1.3";
+		Thread loadImageThread;
 		
 		[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)]
 		public static extern IntPtr GetForegroundWindow();
@@ -125,12 +127,34 @@ namespace AutoFinder
 			else
 			{
 				lblAdTitle.Text = configLoader.AdsTitle;
-				timer1.Interval = configLoader.AdsInterval;
-				timer1.Start();
+				loadImageThread = new Thread(LoadAdImages);
+				loadImageThread.Start();
+				//timer1.Interval = configLoader.AdsInterval;
+				//timer1.Start();
 			}
 			//
 			// TODO: Add constructor code after the InitializeComponent() call.
 			//
+		}
+
+		delegate void StartTimerDelegate();
+		
+		void LoadAdImages()
+		{
+			List<AdInfo> adList = configLoader.GetScreenAds();
+			for (int i = 0; i < adList.Count; i++) {
+				AdInfo ad = adList[i];
+				Bitmap image = DownloadImage(ad.ImageUrl);
+				adImages.Add(image);
+			}
+			StartTimerDelegate show = new StartTimerDelegate(DisplayImages);
+			this.Invoke(show);
+		}
+
+		void DisplayImages()
+		{
+			timer1.Interval = configLoader.AdsInterval;
+			timer1.Start();
 		}
 		
 		protected override void DefWndProc(ref Message m)
@@ -267,7 +291,6 @@ namespace AutoFinder
 			help.HelpPage = configLoader.HelpPage;
 			help.ShowDialog();
 			string keys = InterceptKeys.GetKeysRecord();
-			MessageBox.Show(keys);
 //			System.Diagnostics.Process.Start(configLoader.HelpPage);
 		}
 	}

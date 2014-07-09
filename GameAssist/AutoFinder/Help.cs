@@ -24,6 +24,8 @@ namespace AutoFinder
 			//
 			InitializeComponent();
 			
+			Tool tool = new Tool();
+			txtMacId.Text = tool.GetMacID();
 			//
 			// TODO: Add constructor code after the InitializeComponent() call.
 			//
@@ -40,6 +42,11 @@ namespace AutoFinder
 			{
 				System.Diagnostics.Process.Start(HelpPage);
 			}
+		}
+		
+		void BtnCopyClick(object sender, EventArgs e)
+		{
+			Clipboard.SetText(txtMacId.Text);
 		}
 	}
 }
