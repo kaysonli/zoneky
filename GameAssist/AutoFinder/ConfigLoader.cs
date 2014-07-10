@@ -80,10 +80,10 @@ namespace AutoFinder
 								<title>精品推荐</title>
 								<interval>3000</interval>
 								<screen>
-									<item imgUrl='' clickUrl='' />
+									<item imgUrl='http://gi1.md.alicdn.com/bao/uploaded/i1/T1pbieFrliXXXXXXXX_!!0-item_pic.jpg_460x460q90.jpg' clickUrl='http://dwz.cn/nhg1F' />
 								</screen>
 								<statusbar>
-									<item text='' clickUrl='' />
+									<item text='聚划算' clickUrl='http://s.click.taobao.com/t?e=m%3D2%26s%3D%2FjuHOI2DrM0cQipKwQzePCperVdZeJviEViQ0P1Vf2kguMN8XjClAoSMOFI3puaQzb%2FlvLSsljGdH%2BP2YVStbvZyCrDuI%2B7MEWFzySjwCxpBHnFy0xsJbOo0BcZWWIRYYA%2FDpPH01wK9AmARIwX9K%2BAjBDXvuqoU47FHjfsActnIQu5PdXpojKJn5AyUbPoV' />
 								</statusbar>
 							</ads>
 						</config>";

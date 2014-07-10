@@ -211,7 +211,7 @@ namespace AutoFinder
 						Bitmap bitmap5 = this.differenceFilter.Apply(image);
 						Bitmap bitmap6 = this.grayFilter.Apply(bitmap5);
 						Bitmap bitmap7 = this.thresholdFilter.Apply(bitmap6);
-						this.pictureBox1.Image = bitmap7;
+//						this.pictureBox1.Image = bitmap7;
 						this.bc.ProcessImage(bitmap7);
 						this.diffRects = this.bc.GetObjectsRectangles();
 						this.blobWnd.Location = new Point(this.imageX, this.imageY);
@@ -285,6 +285,11 @@ namespace AutoFinder
 			{
 				Thread t = new Thread(SendEmail);
 				t.Start();
+			}
+			DialogResult confirm = MessageBox.Show("确定退出吗？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+			if(confirm == DialogResult.No)
+			{
+				e.Cancel = true;
 			}
 		}
 		

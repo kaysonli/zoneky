@@ -257,7 +257,6 @@ namespace AutoFinder
 			this.pictureBox1.Image = (System.Drawing.Image) manager.GetObject("pictureBox1.Image");
 			if (this.btnMonitor.Text == "开始找茬")
 			{
-				timer1.Stop();
 				InterceptKeys.RunHook();
 				this.btnMonitor.Text = "不玩了";
 			}
@@ -265,10 +264,6 @@ namespace AutoFinder
 			{
 				InterceptKeys.UnHook();
 				this.blobWnd.Hide();
-				if(isVip == false)
-				{
-					this.timer1.Start();
-				}
 				this.btnMonitor.Text = "开始找茬";
 				
 			}
