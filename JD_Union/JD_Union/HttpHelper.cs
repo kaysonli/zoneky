@@ -11,6 +11,7 @@ using System.Net;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace JD_Union
 {
@@ -21,6 +22,22 @@ namespace JD_Union
 	{
 		public HttpHelper()
 		{
+		}
+		
+		public string Process()
+		{
+			string placementContent = CreatePlacement();
+			Regex regex = new Regex("\"placementId\":[0-9]+");
+			Match match = regex.Match(placementContent);
+			if(match.Success)
+			{
+				string id =match.Value.Split(':')[1];
+				string code = GetCustomCode(id);
+				match = Regex.Match(code, "\"advCode\":\".+?\"");
+				return match.Value.Split(':')[1];
+			}
+			return "";
+			
 		}
 		
 		public string Request(string url, Dictionary<string, string> parameters, string method = "GET")
@@ -66,19 +83,6 @@ namespace JD_Union
 				content = reader.ReadToEnd();
 			}
 			return content;
-		}
-		
-		void GetAdZone()
-		{
-			CookieContainer cc = LoadCookie();
-			string url = "http://media.jd.com/gotoadv/getAdzoneByWebId?id=64738367&type=3&status=1";
-			HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-			req.CookieContainer = cc;
-			HttpWebResponse res = (HttpWebResponse) req.GetResponse();
-			using (StreamReader reader = new StreamReader( res.GetResponseStream()))
-			{
-				string content = reader.ReadToEnd();
-			}
 		}
 
 		public string CreatePlacement()

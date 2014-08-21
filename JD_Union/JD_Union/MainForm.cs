@@ -33,7 +33,7 @@ namespace JD_Union
 		void Button1Click(object sender, EventArgs e)
 		{
 			HttpHelper helper = new HttpHelper();
-			helper.CreatePlacement();
+			string code = helper.Process();
 		}
 	}
 }
