@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+# SharpDevelop 4.4
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JD_Union", "JD_Union\JD_Union.csproj", "{F2AD0A8C-D2DC-4CAE-BAB5-FB13C012538A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2AD0A8C-D2DC-4CAE-BAB5-FB13C012538A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2AD0A8C-D2DC-4CAE-BAB5-FB13C012538A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2AD0A8C-D2DC-4CAE-BAB5-FB13C012538A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2AD0A8C-D2DC-4CAE-BAB5-FB13C012538A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+EndGlobal
