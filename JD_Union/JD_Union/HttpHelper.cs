@@ -32,6 +32,7 @@ namespace JD_Union
 			
 			if(method == "POST")
 			{
+				req.ContentType = "application/x-www-form-urlencoded";
 				//如果需要POST数据
 				if (!(parameters == null || parameters.Count == 0))
 				{
