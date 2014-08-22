@@ -15,38 +15,38 @@ using System.Text.RegularExpressions;
 
 namespace JD_Union
 {
+	public enum CodeType
+	{
+		JavaScript,
+		Url
+	}
+	
 	/// <summary>
 	/// Description of HttpHelper.
 	/// </summary>
 	public class HttpHelper
 	{
-		public HttpHelper()
+		public CodeType CodeType
 		{
+			get;set;
+		}
+		public HttpHelper(CodeType codeType)
+		{
+			this.CodeType = codeType;
 		}
 		
-		public string Process()
-		{
-			string placementContent = CreatePlacement();
-			Regex regex = new Regex("\"placementId\":[0-9]+");
-			Match match = regex.Match(placementContent);
-			if(match.Success)
-			{
-				string id =match.Value.Split(':')[1];
-				string code = GetCustomCode(id);
-				match = Regex.Match(code, "\"advCode\":\".+?\"");
-				return match.Value.Split(':')[1];
-			}
-			return "";
-			
-		}
 		
-		public string Request(string url, Dictionary<string, string> parameters, string method = "GET")
+		
+		public string Request(string url, Dictionary<string, string> parameters, string method)
 		{
 			CookieContainer cc = LoadCookie();
 			HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
 			req.CookieContainer = cc;
 			req.Method = method;
-			
+			if(string.IsNullOrEmpty(method))
+			{
+				method = "GET";
+			}
 			if(method == "POST")
 			{
 				req.ContentType = "application/x-www-form-urlencoded";
@@ -85,7 +85,7 @@ namespace JD_Union
 			return content;
 		}
 
-		public string CreatePlacement()
+		public string CreatePlacement(string itemUrl)
 		{
 			string url = "http://media.jd.com/gotoadv/createPlacement";
 			Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -99,17 +99,27 @@ namespace JD_Union
 			parameters.Add("width","1");
 			parameters.Add("positionId","172123820");
 			parameters.Add("type","1");
-			parameters.Add("wareUrl","http%3A%2F%2Fitem.jd.com%2F11434283.html");
+			parameters.Add("wareUrl",itemUrl);
 			string content = Request(url, parameters, "POST");
 			return content;
 		}
 		
 		public string GetCustomCode(string placementId)
 		{
+			string codeType = "js";
+			if(this.CodeType == CodeType.JavaScript)
+			{
+				codeType = "js";
+			}
+			else
+			{
+				codeType = "url";
+			}
+			
 			string url = "http://media.jd.com/gotoadv/getCustomCode";
 			Dictionary<string, string> parameters = new Dictionary<string, string>();
 			parameters.Add("size", "0");
-			parameters.Add("codeType", "url");
+			parameters.Add("codeType", codeType);
 			parameters.Add("placementId", placementId);
 			string content = Request(url, parameters, "POST");
 			return content;

@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 # SharpDevelop 4.4
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JD_Union", "JD_Union\JD_Union.csproj", "{F2AD0A8C-D2DC-4CAE-BAB5-FB13C012538A}"
 EndProject

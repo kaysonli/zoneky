@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace JD_Union
@@ -32,8 +33,32 @@ namespace JD_Union
 		
 		void Button1Click(object sender, EventArgs e)
 		{
-			HttpHelper helper = new HttpHelper();
-			string code = helper.Process();
+			string itemUrl = "http://item.jd.com/11444582.html";
+			string code = Process(itemUrl, CodeType.JavaScript);
+			MessageBox.Show(code);
+		}
+		
+		string Process(string itemUrl, CodeType codeType)
+		{
+			HttpHelper helper = new HttpHelper(CodeType.JavaScript);
+			helper.CodeType = codeType;
+			string placementContent = helper.CreatePlacement(itemUrl);
+			Regex regex = new Regex("\"placementId\":[0-9]+");
+			Match match = regex.Match(placementContent);
+			if(match.Success)
+			{
+				string id =match.Value.Split(':')[1];
+				string code = helper.GetCustomCode(id);
+				string pattern = "<script.+script>";
+				if(codeType == CodeType.Url)
+				{
+					pattern = "\"http:.+?\"";
+				}
+				match = Regex.Match(code, pattern);
+				return match.Value;
+			}
+			return "";
+			
 		}
 	}
 }
