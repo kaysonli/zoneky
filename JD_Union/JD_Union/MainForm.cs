@@ -34,11 +34,12 @@ namespace JD_Union
 		void Button1Click(object sender, EventArgs e)
 		{
 			string itemUrl = "http://item.jd.com/11444582.html";
-			string code = Process(itemUrl, CodeType.JavaScript);
+			int size = 14;
+			string code = Process(itemUrl, CodeType.JavaScript, size);
 			MessageBox.Show(code);
 		}
 		
-		string Process(string itemUrl, CodeType codeType)
+		string Process(string itemUrl, CodeType codeType, int size)
 		{
 			HttpHelper helper = new HttpHelper(CodeType.JavaScript);
 			helper.CodeType = codeType;
