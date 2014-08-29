@@ -7,6 +7,7 @@ using System.Text;
 using System.Web;
 using System.Diagnostics;
 using System.Configuration;
+using System.Xml;
 
 namespace AAProxy
 {
@@ -34,6 +35,7 @@ namespace AAProxy
             HttpResponse response = context.Response;
             response.StatusCode = 200;
             ForwardRequst(context);
+            context.Response.End();
         }
 
         void Login(HttpContext context)
@@ -42,14 +44,21 @@ namespace AAProxy
             string userName = ConfigurationManager.AppSettings["email"];
             string password = ConfigurationManager.AppSettings["password"];
             string loginUrl = "https://gladmainnew.morningstar.com/loginsrf/login.srf";
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["loginUrl"]))
+            {
+                loginUrl = ConfigurationManager.AppSettings["loginUrl"];
+            }
             HttpWebRequest request = null;
             HttpWebResponse response = null;
             CookieContainer cc = new CookieContainer();
             request = (HttpWebRequest)WebRequest.Create(loginUrl);
             request.ContentType = "application/x-www-form-urlencoded";
             request.Method = "POST";//数据提交方式为POST 
-            string postData = string.Format("rbtn=btnEmail&email={0}&strPassword={1}&rnd={2}&downloadable=1&ProductCode=DIRECT", userName, password, new Random().NextDouble());
-            postData = "rbtn=btnEmail&email={0}&strPassword={1}&Login=Log+in&url=https%3A%2F%2Fassetallocationstg.morningstar.com%2Fassetallocation%2F%3Fdownloadable%3D1%26ProductCode%3DDIRECT%26port%3D%26strInstID%3D%26version%3D&decode=&wkstation=&pagetype=&content=&reset=&rnd=0.717375262043148&downloadable=1&strInstID=&ProductCode=DIRECT&ProductID=DIRECT&login=1&ip=10.86.16.181&hdid=&lang=ENU&mac=&pcname=&org=&impadvisorid=&skout=&HostProductCode=&insesn=1&version=";
+            string postData = "rbtn=btnEmail&email={0}&strPassword={1}&Login=Log+in&url=https%3A%2F%2Fassetallocationstg.morningstar.com%2Fassetallocation%2F%3Fdownloadable%3D1%26ProductCode%3DDIRECT%26port%3D%26strInstID%3D%26version%3D&decode=&wkstation=&pagetype=&content=&reset=&rnd=0.717375262043148&downloadable=1&strInstID=&ProductCode=DIRECT&ProductID=DIRECT&login=1&ip=10.86.16.181&hdid=&lang=ENU&mac=&pcname=&org=&impadvisorid=&skout=&HostProductCode=&insesn=1&version=";
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["loginUrl"]))
+            {
+                postData = ConfigurationManager.AppSettings["loginData"];
+            }
             byte[] postdatabytes = Encoding.UTF8.GetBytes(string.Format(postData, userName, password));
             request.ContentLength = postdatabytes.Length;
             request.AllowAutoRedirect = false;
@@ -83,13 +92,76 @@ namespace AAProxy
             }
         }
 
+        string MakeRequest(string url, HttpContext context)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Accept = string.Join(",", context.Request.AcceptTypes);
+            request.Method = context.Request.HttpMethod;
+            //模拟头
+            request.ContentType = context.Request.ContentType;
+            string postData = context.Request.Form.ToString();
+            if (context.Request.ContentType == "text/xml")
+            {
+                postData = HttpUtility.UrlDecode(context.Request.Form.ToString());
+            }
+            byte[] postdatabytes = Encoding.UTF8.GetBytes(postData);
+            request.ContentLength = postdatabytes.Length;
+            request.AllowAutoRedirect = false;
+            request.CookieContainer = loginCookie;
+            request.KeepAlive = true;
+            request.UserAgent = context.Request.UserAgent;
+            request.Referer = "";
+            if (context.Request.HttpMethod == "POST")
+            {
+                //提交请求   
+                Stream stream;
+                stream = request.GetRequestStream();
+                stream.Write(postdatabytes, 0, postdatabytes.Length);
+                stream.Close();
+            }
+
+            //接收响应
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            //context.Response.ContentEncoding = Encoding.GetEncoding(response.ContentEncoding);
+            context.Response.ContentType = response.ContentType;
+
+            SetCookie(response, context);
+
+            StreamReader sr = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+            string content = sr.ReadToEnd();
+            sr.Close();
+            response.Close();
+            return content;
+        }
+
+        bool IsSessionExpired(string content)
+        {
+            List<string> patterns = new List<string>()
+            {
+                "<html>",
+                "\"type\":\"SessionExpired\"",
+                "<AwsTimeout>"
+            };
+            for (int i = 0; i < patterns.Count; i++)
+            {
+                if (content.IndexOf(patterns[i], StringComparison.CurrentCultureIgnoreCase) > -1)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         void ForwardRequst(HttpContext context)
         {
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(ValidateRemoteCertificate);
-            HttpWebRequest request = null;
-            HttpWebResponse response = null;
 
             string action = context.Request.Url.AbsolutePath;
+            if (action.EndsWith(".html", true, System.Globalization.CultureInfo.CurrentCulture)
+                || action.EndsWith(".js", true, System.Globalization.CultureInfo.CurrentCulture))
+            {
+                return;
+            }
             string proxyName = "assetallocation";
             if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["proxyName"]))
             {
@@ -105,72 +177,15 @@ namespace AAProxy
             string requestUrl = remoteUrl + action + "?" + context.Request.QueryString.ToString();
             try
             {
-                request = (HttpWebRequest)WebRequest.Create(requestUrl);//实例化web访问类
-                request.Method = context.Request.HttpMethod;
-                //模拟头
-                request.ContentType = context.Request.ContentType;
+                string content = MakeRequest(requestUrl, context);
+                StreamReader rd = new StreamReader(context.Request.InputStream);
+                string p = rd.ReadToEnd();
 
-                string postData = context.Request.Form.ToString();
-                byte[] postdatabytes = Encoding.UTF8.GetBytes(postData);
-                request.ContentLength = postdatabytes.Length;
-                request.Accept = string.Join(",", context.Request.AcceptTypes);//application/json,text/json
-                request.AllowAutoRedirect = false;
-                request.CookieContainer = loginCookie;
-                request.KeepAlive = true;
-                request.UserAgent = context.Request.UserAgent;
-
-                if (context.Request.HttpMethod == "POST")
-                {
-                    //提交请求   
-                    Stream stream;
-                    stream = request.GetRequestStream();
-                    stream.Write(postdatabytes, 0, postdatabytes.Length);
-                    stream.Close();
-                }
-
-                //接收响应
-                response = (HttpWebResponse)request.GetResponse();
-                //context.Response.ContentEncoding = Encoding.GetEncoding(response.ContentEncoding);
-                context.Response.ContentType = response.ContentType;
-
-
-                StreamReader sr = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                string content = sr.ReadToEnd();
-                if (content.IndexOf("\"type\":\"SessionExpired\"") > -1)
+                if (IsSessionExpired(content))
                 {
                     Login(context);
-                    request = (HttpWebRequest)WebRequest.Create(requestUrl);//实例化web访问类
-                    request.Method = context.Request.HttpMethod;
-                    //模拟头
-                    request.ContentType = context.Request.ContentType;
-
-                    postData = context.Request.Form.ToString();
-                    postdatabytes = Encoding.UTF8.GetBytes(postData);
-                    request.ContentLength = postdatabytes.Length;
-                    request.AllowAutoRedirect = false;
-                    request.CookieContainer = loginCookie;
-                    request.KeepAlive = true;
-                    if (context.Request.HttpMethod == "POST")
-                    {
-                        //提交请求   
-                        Stream stream;
-                        stream = request.GetRequestStream();
-                        stream.Write(postdatabytes, 0, postdatabytes.Length);
-                        stream.Close();
-                    }
-
-                    //接收响应
-                    response = (HttpWebResponse)request.GetResponse();
-                    //context.Response.ContentEncoding = Encoding.GetEncoding(response.ContentEncoding);
-                    context.Response.ContentType = response.ContentType;
-                    SetCookie(response, context);
-                    using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
-                    {
-                        content = reader.ReadToEnd();
-                    }
+                    content = MakeRequest(requestUrl, context);
                 }
-                SetCookie(response, context);
-                response.Close();
                 context.Response.AddHeader("Access-Control-Allow-Origin", "*");
                 context.Response.AddHeader("Access-Control-Allow-Credentials", "false");
                 context.Response.Write(content);
