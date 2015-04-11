@@ -1,0 +1,18 @@
+{
+  "name": "simple-sloc",
+  "version": "1.0.0",
+  "description": "Simple source line of code statistic.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "loc",
+    "sloc"
+  ],
+  "author": "Kayson Li",
+  "license": "MIT",
+  "devDependencies": {
+    "sloc": "^0.1.9"
+  }
+}
